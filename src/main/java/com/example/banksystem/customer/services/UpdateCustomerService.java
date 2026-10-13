@@ -11,6 +11,7 @@ import com.example.banksystem.customer.model.CreateCustomerResponse;
 import com.example.banksystem.customer.model.Customer;
 import com.example.banksystem.customer.model.UpdateCustomerCommand;
 import com.example.banksystem.exception.CustomerNotFoundException;
+import com.example.banksystem.exception.DuplicateCustomerEmailException;
 
 @Service
 public class UpdateCustomerService implements Command<UpdateCustomerCommand, CreateCustomerResponse> {
@@ -27,6 +28,11 @@ public class UpdateCustomerService implements Command<UpdateCustomerCommand, Cre
 	public CreateCustomerResponse execute(UpdateCustomerCommand updateCustomerCommand) {
 		
 		Optional<Customer> customerOptional = customerRepository.findById(updateCustomerCommand.getId());
+		
+		
+		if (customerRepository.existsByEmail(updateCustomerCommand.getCustomer().getEmail())) {
+		    throw new DuplicateCustomerEmailException();
+		}
 		
 		if(customerOptional.isPresent()) {
 			
