@@ -41,4 +41,12 @@ public class GlobalExceptionHandler {
 
 	    return new ErrorResponse(exception.getMessage());
 	}
+	
+	@ExceptionHandler(AccountNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseBody
+	public ErrorResponse handleAccountNotFoundException(AccountNotFoundException exception) {
+		return new ErrorResponse(exception.getMessage());
+		
+	}
 }

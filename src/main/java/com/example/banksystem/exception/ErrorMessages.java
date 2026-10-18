@@ -7,7 +7,8 @@ public enum ErrorMessages {
     LAST_NAME_REQUIRED("Last name is required"),
     EMAIL_REQUIRED("Email is required"),
     EMAIL_INVALID("Email must be valid"),
-    CUSTOMER_NOT_FOUND("Customer not found");
+    CUSTOMER_NOT_FOUND("Customer not found"),
+	ACCOUNT_NOT_FOUND("Account not found");
   
 	
 	private final String message;
