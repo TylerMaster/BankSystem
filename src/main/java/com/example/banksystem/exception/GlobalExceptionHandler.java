@@ -10,7 +10,25 @@ import org.springframework.http.HttpStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
+	@ExceptionHandler(CannotTransferException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ResponseBody
+	
+	public ErrorResponse handleCannotTransferException(CannotTransferException exception) {
+		
+		return new ErrorResponse(exception.getMessage());
+	}
+	
+	@ExceptionHandler(NotEnoughMoneyException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ResponseBody
+	
+	public ErrorResponse handleNotEnoughMoneyException(NotEnoughMoneyException exception) {
+		
+		return new ErrorResponse(exception.getMessage());
+	}
+	
+	
 	@ExceptionHandler(DuplicateCustomerEmailException.class)
 	@ResponseStatus(HttpStatus.CONFLICT)
 	@ResponseBody

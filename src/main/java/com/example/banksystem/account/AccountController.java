@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.banksystem.account.model.CreateAccountRequest;
 import com.example.banksystem.account.model.CreateAccountResponse;
 import com.example.banksystem.account.model.DepositDTO;
+import com.example.banksystem.account.model.TransferDTO;
 import com.example.banksystem.account.services.CreateAccountService;
 import com.example.banksystem.account.services.DepositService;
 import com.example.banksystem.account.services.GetAccountService;
 import com.example.banksystem.account.services.GetAccountsService;
 import com.example.banksystem.account.services.GetAllCustomerAccountsService;
+import com.example.banksystem.account.services.TransferService;
 
 import jakarta.validation.Valid;
 
@@ -31,14 +33,16 @@ public class AccountController {
 	private final GetAccountsService getAccountsService;
 	private final GetAllCustomerAccountsService getAllCustomerAccountsService;
 	private final DepositService depositService;
+	private final TransferService transferService;
 	
-	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService, GetAllCustomerAccountsService getAllCustomerAccountsService, DepositService depositService) {
+	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService, GetAllCustomerAccountsService getAllCustomerAccountsService, DepositService depositService, TransferService transferService) {
 		
 		this.createAccountService = createAccountService;
 		this.getAccountService = getAccountService;
 		this.getAccountsService = getAccountsService;
 		this.getAllCustomerAccountsService = getAllCustomerAccountsService;
 		this.depositService = depositService;
+		this.transferService = transferService;
 	}
 	
 	
@@ -58,7 +62,11 @@ public class AccountController {
 		
 		return ResponseEntity.ok(depositService.execute(accountId, request));
 	}
-	
+	@PostMapping("/accounts/{accountId}/transfers")
+	public ResponseEntity<String> transfer(@PathVariable("accountId") Integer accountId, 
+					@Valid @RequestBody TransferDTO request){
+		return ResponseEntity.ok(transferService.execute(accountId, request));
+	}
 	
 	@GetMapping("/accounts/{accountId}")
 	public ResponseEntity<CreateAccountResponse> getAccount(@PathVariable("accountId") Integer accountId){

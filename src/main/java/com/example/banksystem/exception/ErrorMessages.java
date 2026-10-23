@@ -8,6 +8,8 @@ public enum ErrorMessages {
     //EMAIL_REQUIRED("Email is required"),
     //EMAIL_INVALID("Email must be valid"),
     CUSTOMER_NOT_FOUND("Customer not found"),
+    NOT_ENOUGH_MONEY("Insufficient funds"),
+    CANNOT_TRANSFER_FUNDS("Cannot transfer funds"),
 	ACCOUNT_NOT_FOUND("Account not found");
   
 	
