@@ -1,5 +1,7 @@
 package com.example.banksystem.account;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import com.example.banksystem.account.model.CreateAccountRequest;
 import com.example.banksystem.account.model.CreateAccountResponse;
 import com.example.banksystem.account.services.CreateAccountService;
 import com.example.banksystem.account.services.GetAccountService;
+import com.example.banksystem.account.services.GetAccountsService;
 
 import jakarta.validation.Valid;
 
@@ -22,11 +25,13 @@ public class AccountController {
 
 	private final CreateAccountService createAccountService;
 	private final GetAccountService getAccountService;
+	private final GetAccountsService getAccountsService;
 	
-	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService) {
+	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService) {
 		
 		this.createAccountService = createAccountService;
 		this.getAccountService = getAccountService;
+		this.getAccountsService = getAccountsService;
 	}
 	
 	
@@ -46,5 +51,9 @@ public class AccountController {
 		
 		
 		return ResponseEntity.ok(getAccountService.execute(accountId));
+	}
+	@GetMapping("/accounts")
+	public ResponseEntity<List<CreateAccountResponse>> getAccount(){
+		return ResponseEntity.ok(getAccountsService.execute(null));
 	}
 }
