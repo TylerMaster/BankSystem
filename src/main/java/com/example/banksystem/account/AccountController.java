@@ -16,6 +16,7 @@ import com.example.banksystem.account.model.CreateAccountResponse;
 import com.example.banksystem.account.services.CreateAccountService;
 import com.example.banksystem.account.services.GetAccountService;
 import com.example.banksystem.account.services.GetAccountsService;
+import com.example.banksystem.account.services.GetAllCustomerAccountsService;
 
 import jakarta.validation.Valid;
 
@@ -26,12 +27,14 @@ public class AccountController {
 	private final CreateAccountService createAccountService;
 	private final GetAccountService getAccountService;
 	private final GetAccountsService getAccountsService;
+	private final GetAllCustomerAccountsService getAllCustomerAccountsService;
 	
-	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService) {
+	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService, GetAllCustomerAccountsService getAllCustomerAccountsService) {
 		
 		this.createAccountService = createAccountService;
 		this.getAccountService = getAccountService;
 		this.getAccountsService = getAccountsService;
+		this.getAllCustomerAccountsService = getAllCustomerAccountsService;
 	}
 	
 	
@@ -53,7 +56,11 @@ public class AccountController {
 		return ResponseEntity.ok(getAccountService.execute(accountId));
 	}
 	@GetMapping("/accounts")
-	public ResponseEntity<List<CreateAccountResponse>> getAccount(){
+	public ResponseEntity<List<CreateAccountResponse>> getAllAccounts(){
 		return ResponseEntity.ok(getAccountsService.execute(null));
+	}
+	@GetMapping("/customers/{customerId}/accounts")
+	public ResponseEntity<List<CreateAccountResponse>> getAllCustomerAccounts(@PathVariable("customerId") Integer customerId){
+		return ResponseEntity.ok(getAllCustomerAccountsService.execute(customerId));
 	}
 }
