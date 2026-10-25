@@ -21,6 +21,7 @@ import com.example.banksystem.account.services.GetAccountService;
 import com.example.banksystem.account.services.GetAccountsService;
 import com.example.banksystem.account.services.GetAllCustomerAccountsService;
 import com.example.banksystem.account.services.TransferService;
+import com.example.banksystem.account.services.WithdrawalService;
 
 import jakarta.validation.Valid;
 
@@ -34,8 +35,9 @@ public class AccountController {
 	private final GetAllCustomerAccountsService getAllCustomerAccountsService;
 	private final DepositService depositService;
 	private final TransferService transferService;
+	private final WithdrawalService withdrawalService;
 	
-	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService, GetAllCustomerAccountsService getAllCustomerAccountsService, DepositService depositService, TransferService transferService) {
+	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService, GetAllCustomerAccountsService getAllCustomerAccountsService, DepositService depositService, TransferService transferService, WithdrawalService withdrawalService) {
 		
 		this.createAccountService = createAccountService;
 		this.getAccountService = getAccountService;
@@ -43,6 +45,7 @@ public class AccountController {
 		this.getAllCustomerAccountsService = getAllCustomerAccountsService;
 		this.depositService = depositService;
 		this.transferService = transferService;
+		this.withdrawalService = withdrawalService;
 	}
 	
 	
@@ -61,6 +64,12 @@ public class AccountController {
 			        @Valid @RequestBody DepositDTO request) {
 		
 		return ResponseEntity.ok(depositService.execute(accountId, request));
+	}
+	@PostMapping("/accounts/{accountId}/withdrawals")
+	public ResponseEntity<String> withdraw(@PathVariable("accountId") Integer accountId,
+			@Valid @RequestBody DepositDTO request){
+		
+		return ResponseEntity.ok(withdrawalService.execute(accountId, request));
 	}
 	@PostMapping("/accounts/{accountId}/transfers")
 	public ResponseEntity<String> transfer(@PathVariable("accountId") Integer accountId, 

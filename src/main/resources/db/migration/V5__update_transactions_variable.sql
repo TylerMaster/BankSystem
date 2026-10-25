@@ -1,0 +1,2 @@
+ALTER TABLE transactions
+RENAME COLUMN type TO transaction_type;
