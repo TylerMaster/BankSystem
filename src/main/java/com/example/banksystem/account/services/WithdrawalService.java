@@ -1,5 +1,7 @@
 package com.example.banksystem.account.services;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -8,17 +10,31 @@ import com.example.banksystem.TwoParamCommand;
 import com.example.banksystem.account.AccountRepository;
 import com.example.banksystem.account.model.Account;
 import com.example.banksystem.account.model.DepositDTO;
+import com.example.banksystem.account.transactions.AccountEntry;
+import com.example.banksystem.account.transactions.Transaction;
+import com.example.banksystem.account.transactions.TransactionType;
+import com.example.banksystem.account.transactions.repositories.AccountEntryRepository;
+import com.example.banksystem.account.transactions.repositories.TransactionRepository;
 import com.example.banksystem.exception.AccountNotFoundException;
+import com.example.banksystem.exception.CantBeZeroOrLessException;
 import com.example.banksystem.exception.NotEnoughMoneyException;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class WithdrawalService implements TwoParamCommand<DepositDTO, String> {
 
 	
 	private final AccountRepository accountRepository;
+	private final TransactionRepository transactionRepository;
+	private final AccountEntryRepository accountEntryRepository;
 	
-	public WithdrawalService(AccountRepository accountRepository) {
+	
+	public WithdrawalService(AccountRepository accountRepository, TransactionRepository transactionRepository, AccountEntryRepository accountEntryRepository) {
 		this.accountRepository = accountRepository;
+		this.transactionRepository = transactionRepository;
+		this.accountEntryRepository = accountEntryRepository;
 		
 	}
 	
@@ -26,12 +42,32 @@ public class WithdrawalService implements TwoParamCommand<DepositDTO, String> {
 	public String execute(Integer accountId, DepositDTO request) {
 		Optional<Account> account = accountRepository.findById(accountId);
 		if(account.isPresent()) {
+			
+			 if (request.getAmount() == null
+		                || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+		            throw new CantBeZeroOrLessException();
+		        }
+			
 			if(request.getAmount().compareTo(account.get().getBalance()) > 0) {
 				throw new NotEnoughMoneyException();
 			}
 			
 			account.get().setBalance(account.get().getBalance().subtract(request.getAmount()));
 			accountRepository.save(account.get());
+			
+			Transaction transaction = new Transaction();
+			transaction.setTransactionType(TransactionType.TRANSACTION_TYPE_WITHDRAW.getMessage());
+			transaction.setCreatedAt(LocalDateTime.now());
+			transactionRepository.save(transaction);
+			
+			
+			AccountEntry accountEntry = new AccountEntry();
+			accountEntry.setTransaction(transaction);
+			accountEntry.setAccount(account.get());
+			accountEntry.setAmount(request.getAmount().negate());
+			accountEntryRepository.save(accountEntry);
+			
+			
 		return "success";
 		}
 		throw new AccountNotFoundException();

@@ -19,6 +19,15 @@ public class GlobalExceptionHandler {
 		return new ErrorResponse(exception.getMessage());
 	}
 	
+	@ExceptionHandler(CantBeZeroOrLessException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ResponseBody
+	
+	public ErrorResponse handleCantBeZeroOrLessException(CantBeZeroOrLessException exception) {
+		
+		return new ErrorResponse(exception.getMessage());
+	}
+	
 	@ExceptionHandler(NotEnoughMoneyException.class)
 	@ResponseStatus(HttpStatus.CONFLICT)
 	@ResponseBody
