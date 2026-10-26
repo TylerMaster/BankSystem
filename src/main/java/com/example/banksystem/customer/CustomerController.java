@@ -27,7 +27,7 @@ import com.example.banksystem.customer.services.UpdateCustomerService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/api")
 public class CustomerController {
 
 	private final CreateCustomerService createCustomerService;
@@ -46,7 +46,7 @@ public class CustomerController {
         this.searchCustomerService = searchCustomerService;
     }
     
-    @PostMapping
+    @PostMapping("/createnewuser")
     public ResponseEntity<CreateCustomerResponse> createCustomer(
     		@Valid @RequestBody CreateCustomerRequest request){
     	
@@ -55,29 +55,29 @@ public class CustomerController {
     	
     	return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    @GetMapping
+    @GetMapping("/customers")
     public ResponseEntity<List<CreateCustomerResponse>> getCustomers(){
     	return ResponseEntity.ok(getCustomersService.execute(null));
     }
     
-    @GetMapping("/{id}")
+    @GetMapping("/customers/{id}")
     public ResponseEntity<CreateCustomerResponse> getCustomer(
     		@PathVariable("id") Integer id){
     	
     	return ResponseEntity.ok(getCustomerService.execute(id));
     }
-    @GetMapping("/search")
+    @GetMapping("/customers/search")
     public ResponseEntity<List<CreateCustomerResponse>> searchCustomer(@RequestParam("name") String name){
     	return ResponseEntity.ok(searchCustomerService.execute(name));
     }
-    @PutMapping("/{id}")
+    @PutMapping("/customers/{id}")
     public ResponseEntity<CreateCustomerResponse> updateCustomer(
     		 @PathVariable("id") Integer id, @Valid @RequestBody CreateCustomerRequest createCustomerRequest){
     	
     	return ResponseEntity.ok(updateCustomerService.execute(new UpdateCustomerCommand(id, createCustomerRequest)));
     	
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/customers/{id}")
     public ResponseEntity<Void> deleteCustomer(
     		@PathVariable("id") Integer id){
     	

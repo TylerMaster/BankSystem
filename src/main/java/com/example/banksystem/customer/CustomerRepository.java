@@ -1,6 +1,7 @@
 package com.example.banksystem.customer;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 		       OR LOWER(c.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
 		    """)
 	List<Customer> findByFirstNameOrLastNameContaining(@Param("keyword") String name);
+	
+	Optional<Customer> findByEmail(String email);
 }

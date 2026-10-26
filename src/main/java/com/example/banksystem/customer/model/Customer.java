@@ -37,6 +37,9 @@ public class Customer {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 	
+	@Column(name = "password_hash", nullable = false)
+	private String passwordHash;
+	
 	@OneToMany(mappedBy = "customer")
 	private List<Account> accounts = new ArrayList<>();
 	

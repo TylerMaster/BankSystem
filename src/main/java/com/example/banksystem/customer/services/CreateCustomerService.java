@@ -2,6 +2,7 @@ package com.example.banksystem.customer.services;
 
 import java.time.LocalDateTime;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.banksystem.Command;
@@ -14,10 +15,13 @@ import com.example.banksystem.exception.DuplicateCustomerEmailException;
 public class CreateCustomerService implements Command<CreateCustomerRequest, CreateCustomerResponse>{
 
 	
+	private final PasswordEncoder encoder;
+	
 	private final CustomerRepository customerRepository;
 	
-	public CreateCustomerService(CustomerRepository customerRepository) {
+	public CreateCustomerService(CustomerRepository customerRepository, PasswordEncoder encoder) {
 	    this.customerRepository = customerRepository;
+	    this.encoder = encoder;
 	}
 	
 	@Override
@@ -31,6 +35,7 @@ public class CreateCustomerService implements Command<CreateCustomerRequest, Cre
 	    customer.setFirstName(input.getFirstName());
 	    customer.setLastName(input.getLastName());
 	    customer.setEmail(input.getEmail());
+	    customer.setPasswordHash(encoder.encode(input.getPassword()));
 	    customer.setStatus("ACTIVE");
 	    customer.setCreatedAt(LocalDateTime.now());
 

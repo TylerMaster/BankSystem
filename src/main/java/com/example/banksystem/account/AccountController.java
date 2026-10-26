@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.banksystem.account.model.CreateAccountRequest;
 import com.example.banksystem.account.model.CreateAccountResponse;
 import com.example.banksystem.account.model.DepositDTO;
+import com.example.banksystem.account.model.RetrieveAccountEntryResponse;
 import com.example.banksystem.account.model.TransferDTO;
 import com.example.banksystem.account.services.CreateAccountService;
 import com.example.banksystem.account.services.DepositService;
+import com.example.banksystem.account.services.GetAccountEntriesService;
 import com.example.banksystem.account.services.GetAccountService;
 import com.example.banksystem.account.services.GetAccountsService;
 import com.example.banksystem.account.services.GetAllCustomerAccountsService;
@@ -36,8 +38,9 @@ public class AccountController {
 	private final DepositService depositService;
 	private final TransferService transferService;
 	private final WithdrawalService withdrawalService;
+	private final GetAccountEntriesService getAccountEntriesService;
 	
-	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService, GetAllCustomerAccountsService getAllCustomerAccountsService, DepositService depositService, TransferService transferService, WithdrawalService withdrawalService) {
+	public AccountController(CreateAccountService createAccountService, GetAccountService getAccountService, GetAccountsService getAccountsService, GetAllCustomerAccountsService getAllCustomerAccountsService, DepositService depositService, TransferService transferService, WithdrawalService withdrawalService, GetAccountEntriesService getAccountEntriesService) {
 		
 		this.createAccountService = createAccountService;
 		this.getAccountService = getAccountService;
@@ -46,6 +49,7 @@ public class AccountController {
 		this.depositService = depositService;
 		this.transferService = transferService;
 		this.withdrawalService = withdrawalService;
+		this.getAccountEntriesService = getAccountEntriesService;
 	}
 	
 	
@@ -75,6 +79,12 @@ public class AccountController {
 	public ResponseEntity<String> transfer(@PathVariable("accountId") Integer accountId, 
 					@Valid @RequestBody TransferDTO request){
 		return ResponseEntity.ok(transferService.execute(accountId, request));
+	}
+	
+	@GetMapping("/accounts/{accountId}/accountentries")
+	public ResponseEntity<List<RetrieveAccountEntryResponse>> getAccountEntries(@PathVariable("accountId") Integer accountId){
+		
+		return ResponseEntity.ok(getAccountEntriesService.execute(accountId));
 	}
 	
 	@GetMapping("/accounts/{accountId}")
