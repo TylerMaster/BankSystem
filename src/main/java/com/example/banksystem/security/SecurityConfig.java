@@ -12,6 +12,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.example.banksystem.security.jwt.JwtAuthenticationFilter;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+
 
 @Configuration
 public class SecurityConfig {
@@ -33,17 +37,26 @@ public class SecurityConfig {
 
 		 return httpSecurity
 					.csrf(csrf -> csrf.disable())
+					.exceptionHandling(exception -> exception
+					        .authenticationEntryPoint(
+					            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
+					        )
+					    )
 					.authorizeHttpRequests(authorize -> {
-						
+						authorize.requestMatchers("/login").permitAll();
 						authorize.requestMatchers("/api/createnewuser").permitAll();
+						  authorize.requestMatchers("/error").permitAll();
 						
 						authorize.anyRequest().authenticated();
 					})
-					.addFilterBefore(
-							new BasicAuthenticationFilter(authenticationManager(httpSecurity)),
-							UsernamePasswordAuthenticationFilter.class)
+					.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 					.build();
 	    }
+	 
+	 @Bean
+	 public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		 return new JwtAuthenticationFilter();
+	 }
 	 
 	 
 	}
