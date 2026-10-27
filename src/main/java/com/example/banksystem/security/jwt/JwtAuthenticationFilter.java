@@ -5,22 +5,35 @@ import java.util.Collections;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.banksystem.security.services.CustomerDetailsService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+	
+	 private final CustomerDetailsService customerDetailsService;
+	    
+	    public JwtAuthenticationFilter(
+	            CustomerDetailsService customerDetailsService) {
+	        this.customerDetailsService = customerDetailsService;
+	    }
+	    
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
 									HttpServletResponse response,
 									FilterChain filterChain)
 			throws ServletException, IOException{
 										
-
+	   
+	    
 		String authHeader = request.getHeader("Authorization");
 		
 	
@@ -39,17 +52,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 		        return;
 		    }
+		    
+		    String email = JwtUtil.getClaims(token).getSubject();
+
+            try {
+                UserDetails userDetails =
+                    customerDetailsService.loadUserByUsername(email);
+
+                if (!userDetails.isEnabled()) {
+                	SecurityContextHolder.clearContext();
+                    response.setStatus(
+                        HttpServletResponse.SC_UNAUTHORIZED
+                    );
+                    return;
+                }
+		    
 
 		    Authentication authentication =
 		            new UsernamePasswordAuthenticationToken(
-		                    JwtUtil.getClaims(token).getSubject(),
+		                    userDetails,
 		                    null,
-		                    Collections.emptyList()
+		                    userDetails.getAuthorities()
 		            );
 
 		    SecurityContextHolder.getContext()
 		            .setAuthentication(authentication);
-		}
+		    
+            }catch (UsernameNotFoundException e) {
+                SecurityContextHolder.clearContext();
+                response.setStatus(
+                    HttpServletResponse.SC_UNAUTHORIZED
+                );
+                return;
+            }
+        }
+		
 
 		filterChain.doFilter(request, response);
 	}

@@ -13,6 +13,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.example.banksystem.security.jwt.JwtAuthenticationFilter;
+import com.example.banksystem.security.services.CustomerDetailsService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
@@ -20,7 +22,11 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @Configuration
 public class SecurityConfig {
 	
+	private final CustomerDetailsService customerDetailsService;
 	
+	public SecurityConfig(CustomerDetailsService customerDetailsService) {
+		this.customerDetailsService = customerDetailsService;
+	}
 	@Bean
 	public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).build();		
@@ -46,6 +52,7 @@ public class SecurityConfig {
 						authorize.requestMatchers("/login").permitAll();
 						authorize.requestMatchers("/api/createnewuser").permitAll();
 						  authorize.requestMatchers("/error").permitAll();
+						  authorize.requestMatchers("/testdisable/{customerId}").permitAll();
 						
 						authorize.anyRequest().authenticated();
 					})
@@ -55,7 +62,7 @@ public class SecurityConfig {
 	 
 	 @Bean
 	 public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		 return new JwtAuthenticationFilter();
+		 return new JwtAuthenticationFilter(customerDetailsService);
 	 }
 	 
 	 
