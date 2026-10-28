@@ -54,7 +54,7 @@ public class SecurityConfig {
 						  authorize.requestMatchers("/error").permitAll();
 						  authorize.requestMatchers("/testdisable/{customerId}").permitAll();
 						
-						authorize.anyRequest().authenticated();
+						authorize.anyRequest().hasRole("CUSTOMER");
 					})
 					.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 					.build();

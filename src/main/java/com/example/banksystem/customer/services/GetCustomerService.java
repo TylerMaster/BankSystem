@@ -4,6 +4,9 @@ import com.example.banksystem.exception.CustomerNotFoundException;
 
 import java.util.Optional;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.banksystem.Query;
@@ -23,6 +26,18 @@ public class GetCustomerService implements Query<Integer, CreateCustomerResponse
 		
 		Optional<Customer> customerOptional = customerRepository.findById(input);
 		if(customerOptional.isPresent()) {
+			
+			Authentication authentication =
+	                SecurityContextHolder.getContext().getAuthentication();
+		  
+		  String authenticatedEmail = authentication.getName();
+		  
+		  if(!customerOptional.get().getEmail()
+				  .equalsIgnoreCase(authenticatedEmail)) {
+			  
+			  throw new AccessDeniedException(
+					  "You are not authorized to access this user's accounts");
+		  }
 			Customer customer = customerOptional.get();
 			
 			  CreateCustomerResponse response = new CreateCustomerResponse();
@@ -31,6 +46,7 @@ public class GetCustomerService implements Query<Integer, CreateCustomerResponse
 		        response.setLastName(customer.getLastName());
 		        response.setEmail(customer.getEmail());
 		        response.setStatus(customer.getStatus());
+		        
 
 		        return response;
 		}

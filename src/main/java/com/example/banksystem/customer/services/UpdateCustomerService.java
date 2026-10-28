@@ -2,6 +2,9 @@ package com.example.banksystem.customer.services;
 
 import java.util.Optional;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.banksystem.Command;
@@ -27,15 +30,30 @@ public class UpdateCustomerService implements Command<UpdateCustomerCommand, Cre
 	@Override
 	public CreateCustomerResponse execute(UpdateCustomerCommand updateCustomerCommand) {
 		
+		
 		Optional<Customer> customerOptional = customerRepository.findById(updateCustomerCommand.getId());
-		
-		
-		if (customerRepository.existsByEmail(updateCustomerCommand.getCustomer().getEmail())) {
-		    throw new DuplicateCustomerEmailException();
-		}
+		Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+	  
+	  String authenticatedEmail = authentication.getName();
+	  
 		
 		if(customerOptional.isPresent()) {
 			
+		
+		  
+		  if(!customerOptional.get().getEmail()
+				  .equalsIgnoreCase(authenticatedEmail)) {
+			  
+			  throw new AccessDeniedException(
+					  "You are not authorized to access this user");
+		  }
+			
+		  if(!customerOptional.get().getEmail().equals(updateCustomerCommand.getCustomer().getEmail())) {
+				if (customerRepository.existsByEmail(updateCustomerCommand.getCustomer().getEmail())) {
+				    throw new DuplicateCustomerEmailException();
+				}
+				}
 	
 			Customer customer = new Customer();
 			customer.setId(updateCustomerCommand.getId());
@@ -43,6 +61,7 @@ public class UpdateCustomerService implements Command<UpdateCustomerCommand, Cre
 			customer.setLastName(updateCustomerCommand.getCustomer().getLastName());
 			customer.setEmail(updateCustomerCommand.getCustomer().getEmail());
 			customer.setStatus(customerOptional.get().getStatus());
+			customer.setPasswordHash(customerOptional.get().getPasswordHash());
 			customer.setCreatedAt(customerOptional.get().getCreatedAt());
 			customerRepository.save(customer);
 			

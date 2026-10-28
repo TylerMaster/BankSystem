@@ -2,6 +2,9 @@ package com.example.banksystem.account.services;
 
 import java.util.Optional;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.banksystem.Query;
@@ -26,8 +29,23 @@ public class GetAccountService implements Query<Integer, CreateAccountResponse> 
 		
 		Optional<Account> account = accountRepository.findById(id);
 		if (account.isPresent()) {
+			  Authentication authentication =
+		                SecurityContextHolder.getContext().getAuthentication();
+			  
+			  String authenticatedEmail = authentication.getName();
+			  
+			  if(!account.get().getCustomer().getEmail()
+					  .equalsIgnoreCase(authenticatedEmail)) {
+				  
+				  throw new AccessDeniedException(
+						  "You are not authorized to access this account");
+			  }
 			
-			return new CreateAccountResponse(account.get().getId(), account.get().getAccountNumber(), account.get().getBalance(), account.get().getStatus(), account.get().getCustomer().getId());
+			return new CreateAccountResponse(account.get().getId(),
+											 account.get().getAccountNumber(), 
+											 account.get().getBalance(), 
+											 account.get().getStatus(), 
+											 account.get().getCustomer().getId());
 			
 		}
 		throw new AccountNotFoundException();
