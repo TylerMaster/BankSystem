@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.banksystem.customer.model.ChangeCustomerRoleRequest;
 import com.example.banksystem.customer.model.CreateCustomerRequest;
 import com.example.banksystem.customer.model.CreateCustomerResponse;
+
 import com.example.banksystem.customer.model.UpdateCustomerCommand;
+import com.example.banksystem.customer.services.ChangeCustomerRoleService;
 import com.example.banksystem.customer.services.CreateCustomerService;
 import com.example.banksystem.customer.services.DeleteCustomerService;
 import com.example.banksystem.customer.services.GetCustomerService;
@@ -36,14 +39,16 @@ public class CustomerController {
 	private final UpdateCustomerService updateCustomerService;
 	private final DeleteCustomerService deleteCustomerService;
 	private final SearchCustomerService searchCustomerService;
+	private final ChangeCustomerRoleService changeCustomerRoleService;
 
-    public CustomerController(CreateCustomerService createCustomerService, GetCustomerService getCustomerService, GetCustomersService getCustomersService, UpdateCustomerService updateCustomerService, DeleteCustomerService deleteCustomerService, SearchCustomerService searchCustomerService) {
+    public CustomerController(CreateCustomerService createCustomerService, GetCustomerService getCustomerService, GetCustomersService getCustomersService, UpdateCustomerService updateCustomerService, DeleteCustomerService deleteCustomerService, SearchCustomerService searchCustomerService, ChangeCustomerRoleService changeCustomerRoleService) {
         this.createCustomerService = createCustomerService;
         this.getCustomerService = getCustomerService;
         this.getCustomersService = getCustomersService;
         this.updateCustomerService = updateCustomerService;
         this.deleteCustomerService = deleteCustomerService;
         this.searchCustomerService = searchCustomerService;
+        this.changeCustomerRoleService = changeCustomerRoleService;
     }
     
     @PostMapping("/createnewuser")
@@ -55,7 +60,7 @@ public class CustomerController {
     	
     	return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    @GetMapping("/customers")
+    @GetMapping("/admin/customers")
     public ResponseEntity<List<CreateCustomerResponse>> getCustomers(){
     	return ResponseEntity.ok(getCustomersService.execute(null));
     }
@@ -66,7 +71,7 @@ public class CustomerController {
     	
     	return ResponseEntity.ok(getCustomerService.execute(id));
     }
-    @GetMapping("/customers/search")
+    @GetMapping("/admin/customers/search")
     public ResponseEntity<List<CreateCustomerResponse>> searchCustomer(@RequestParam("name") String name){
     	return ResponseEntity.ok(searchCustomerService.execute(name));
     }
@@ -77,7 +82,12 @@ public class CustomerController {
     	return ResponseEntity.ok(updateCustomerService.execute(new UpdateCustomerCommand(id, createCustomerRequest)));
     	
     }
-    @DeleteMapping("/customers/{id}")
+    @PutMapping("/admin/customers/roles/{id}")
+    public ResponseEntity<String> changeCustomerRole(@PathVariable("id") Integer id, @RequestBody ChangeCustomerRoleRequest roles){
+    	return ResponseEntity.ok(changeCustomerRoleService.execute(id, roles.getRole()));
+    }
+    
+    @DeleteMapping("/admin/customers/{id}")
     public ResponseEntity<Void> deleteCustomer(
     		@PathVariable("id") Integer id){
     	

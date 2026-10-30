@@ -39,13 +39,17 @@ public class GetAllCustomerAccountsService implements Query<Integer, List<Create
 		                SecurityContextHolder.getContext().getAuthentication();
 			  
 			  String authenticatedEmail = authentication.getName();
-			  
+			  boolean isAdmin = authentication.getAuthorities().stream()
+				        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+			 
+		if(!isAdmin) {
 			  if(!customer.get().getEmail()
 					  .equalsIgnoreCase(authenticatedEmail)) {
 				  
 				  throw new AccessDeniedException(
 						  "You are not authorized to access this user's accounts");
 			  }
+		}
 			
 			List<Account> accounts = customer.get().getAccounts();
 			List<CreateAccountResponse> responseList = new ArrayList<>();

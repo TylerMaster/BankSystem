@@ -41,13 +41,17 @@ public class UpdateCustomerService implements Command<UpdateCustomerCommand, Cre
 		if(customerOptional.isPresent()) {
 			
 		
-		  
+			 boolean isAdmin = authentication.getAuthorities().stream()
+				        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+			 
+		if(!isAdmin) {
 		  if(!customerOptional.get().getEmail()
 				  .equalsIgnoreCase(authenticatedEmail)) {
 			  
 			  throw new AccessDeniedException(
 					  "You are not authorized to access this user");
 		  }
+		}
 			
 		  if(!customerOptional.get().getEmail().equals(updateCustomerCommand.getCustomer().getEmail())) {
 				if (customerRepository.existsByEmail(updateCustomerCommand.getCustomer().getEmail())) {
@@ -63,6 +67,7 @@ public class UpdateCustomerService implements Command<UpdateCustomerCommand, Cre
 			customer.setStatus(customerOptional.get().getStatus());
 			customer.setPasswordHash(customerOptional.get().getPasswordHash());
 			customer.setCreatedAt(customerOptional.get().getCreatedAt());
+			customer.setRole(customerOptional.get().getRole());
 			customerRepository.save(customer);
 			
 			CreateCustomerResponse createCustomerResponse = new CreateCustomerResponse();

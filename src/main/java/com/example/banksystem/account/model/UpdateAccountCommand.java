@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UpdateAccountCommand {
 	Integer Id;
-	CreateAccountRequest customer;
+	CreateAccountRequest account;
 }

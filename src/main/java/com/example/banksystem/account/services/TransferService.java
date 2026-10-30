@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
@@ -42,6 +45,23 @@ public class TransferService implements TwoParamCommand<TransferDTO, String>{
 	public String execute(Integer fromAccountId, TransferDTO input){
 		Optional<Account> fromAccount = accountRepository.findById(fromAccountId);
 		Optional<Account> toAccount = accountRepository.findByAccountNumber(input.getToAccountNumber());
+		
+		Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+	  
+	  String authenticatedEmail = authentication.getName();
+	  boolean isAdmin = authentication.getAuthorities().stream()
+		        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+	 
+if(!isAdmin) {
+	  if(!fromAccount.get().getCustomer().getEmail()
+			  .equalsIgnoreCase(authenticatedEmail)) {
+		  
+		  throw new AccessDeniedException(
+				  "You are not authorized to access this user's accounts");
+	  }
+}
+		
 		if(fromAccount.isPresent() && toAccount.isPresent()) {
 			if (fromAccount.get().getId().equals(toAccount.get().getId())) {
 				throw new CannotTransferException();

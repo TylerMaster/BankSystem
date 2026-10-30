@@ -34,13 +34,17 @@ public class GetAccountService implements Query<Integer, CreateAccountResponse> 
 			  
 			  String authenticatedEmail = authentication.getName();
 			  
+			  boolean isAdmin = authentication.getAuthorities().stream()
+				        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+			 
+		if(!isAdmin) {
 			  if(!account.get().getCustomer().getEmail()
 					  .equalsIgnoreCase(authenticatedEmail)) {
 				  
 				  throw new AccessDeniedException(
 						  "You are not authorized to access this account");
 			  }
-			
+		}
 			return new CreateAccountResponse(account.get().getId(),
 											 account.get().getAccountNumber(), 
 											 account.get().getBalance(), 

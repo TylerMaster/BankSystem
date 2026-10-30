@@ -31,13 +31,17 @@ public class GetCustomerService implements Query<Integer, CreateCustomerResponse
 	                SecurityContextHolder.getContext().getAuthentication();
 		  
 		  String authenticatedEmail = authentication.getName();
-		  
+		  boolean isAdmin = authentication.getAuthorities().stream()
+			        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+		 
+	if(!isAdmin) {
 		  if(!customerOptional.get().getEmail()
 				  .equalsIgnoreCase(authenticatedEmail)) {
 			  
 			  throw new AccessDeniedException(
 					  "You are not authorized to access this user's accounts");
 		  }
+	}
 			Customer customer = customerOptional.get();
 			
 			  CreateCustomerResponse response = new CreateCustomerResponse();

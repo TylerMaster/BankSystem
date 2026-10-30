@@ -39,13 +39,17 @@ public class CreateAccountService implements TwoParamCommand<CreateAccountReques
 	                SecurityContextHolder.getContext().getAuthentication();
 		  
 		  String authenticatedEmail = authentication.getName();
-		  
+		  boolean isAdmin = authentication.getAuthorities().stream()
+			        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+		 
+	if(!isAdmin) {
 		  if(!customer.getEmail()
 				  .equalsIgnoreCase(authenticatedEmail)) {
 			  
 			  throw new AccessDeniedException(
 					  "You are not authorized to access this user's accounts");
 		  }
+	}
 			
 			
 			Account account = new Account();

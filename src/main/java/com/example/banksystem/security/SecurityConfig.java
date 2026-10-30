@@ -53,8 +53,10 @@ public class SecurityConfig {
 						authorize.requestMatchers("/api/createnewuser").permitAll();
 						  authorize.requestMatchers("/error").permitAll();
 						  authorize.requestMatchers("/testdisable/{customerId}").permitAll();
+						  
+						  authorize.requestMatchers("/api/admin/**").hasRole("ADMIN");
 						
-						authorize.anyRequest().hasRole("CUSTOMER");
+						authorize.anyRequest().hasAnyRole("CUSTOMER", "ADMIN");
 					})
 					.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 					.build();
