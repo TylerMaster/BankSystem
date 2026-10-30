@@ -15,6 +15,7 @@ import com.example.banksystem.account.model.CreateAccountRequest;
 import com.example.banksystem.account.model.CreateAccountResponse;
 import com.example.banksystem.customer.CustomerRepository;
 import com.example.banksystem.customer.model.Customer;
+import com.example.banksystem.customer.model.CustomerStatus;
 import com.example.banksystem.exception.CustomerNotFoundException;
 @Service
 public class CreateAccountService implements TwoParamCommand<CreateAccountRequest, CreateAccountResponse>{
@@ -55,7 +56,7 @@ public class CreateAccountService implements TwoParamCommand<CreateAccountReques
 			Account account = new Account();
 			account.setAccountNumber(request.getAccountNumber());
 			account.setBalance(BigDecimal.ZERO);
-			account.setStatus("ACTIVE");
+			account.setStatus(CustomerStatus.ACTIVE.getMessage());
 			account.setCustomer(customer);
 			
 			Account savedAccount = accountRepository.save(account);

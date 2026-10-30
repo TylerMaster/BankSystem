@@ -10,6 +10,7 @@ import com.example.banksystem.customer.CustomerRepository;
 import com.example.banksystem.customer.model.CreateCustomerRequest;
 import com.example.banksystem.customer.model.CreateCustomerResponse;
 import com.example.banksystem.customer.model.Customer;
+import com.example.banksystem.customer.model.CustomerStatus;
 import com.example.banksystem.exception.DuplicateCustomerEmailException;
 @Service
 public class CreateCustomerService implements Command<CreateCustomerRequest, CreateCustomerResponse>{
@@ -36,7 +37,7 @@ public class CreateCustomerService implements Command<CreateCustomerRequest, Cre
 	    customer.setLastName(input.getLastName());
 	    customer.setEmail(input.getEmail());
 	    customer.setPasswordHash(encoder.encode(input.getPassword()));
-	    customer.setStatus("ACTIVE");
+	    customer.setStatus(CustomerStatus.ACTIVE.getMessage());
 	    customer.setCreatedAt(LocalDateTime.now());
 
 	    Customer savedCustomer = customerRepository.save(customer);

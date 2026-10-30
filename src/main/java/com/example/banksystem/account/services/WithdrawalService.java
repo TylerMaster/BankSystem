@@ -18,7 +18,9 @@ import com.example.banksystem.account.transactions.Transaction;
 import com.example.banksystem.account.transactions.TransactionType;
 import com.example.banksystem.account.transactions.repositories.AccountEntryRepository;
 import com.example.banksystem.account.transactions.repositories.TransactionRepository;
+import com.example.banksystem.customer.model.CustomerStatus;
 import com.example.banksystem.exception.AccountNotFoundException;
+import com.example.banksystem.exception.CannotTransferException;
 import com.example.banksystem.exception.CantBeZeroOrLessException;
 import com.example.banksystem.exception.NotEnoughMoneyException;
 
@@ -46,6 +48,14 @@ public class WithdrawalService implements TwoParamCommand<DepositDTO, String> {
 		Optional<Account> account = accountRepository.findById(accountId);
 		if(account.isPresent()) {
 			
+			if (!account.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
+					|| !account.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
+				throw new CannotTransferException();
+			}
+		if (!account.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
+					|| !account.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
+				throw new CannotTransferException();
+			}
 			
 			Authentication authentication =
 	                SecurityContextHolder.getContext().getAuthentication();
