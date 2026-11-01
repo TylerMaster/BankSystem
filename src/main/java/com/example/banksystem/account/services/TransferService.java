@@ -44,8 +44,13 @@ public class TransferService implements TwoParamCommand<TransferDTO, String>{
 	}
 	@Override
 	public String execute(Integer fromAccountId, TransferDTO input){
-		Optional<Account> fromAccount = accountRepository.findById(fromAccountId);
-		Optional<Account> toAccount = accountRepository.findByAccountNumber(input.getToAccountNumber());
+		Optional<Account> fromAccount =
+			    accountRepository.findByIdWithLock(fromAccountId);
+		
+		Optional<Account> toAccount =
+			    accountRepository.findByAccountNumberWithLock(
+			        input.getToAccountNumber()
+			    );
 		
 		Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -54,24 +59,31 @@ public class TransferService implements TwoParamCommand<TransferDTO, String>{
 	  boolean isAdmin = authentication.getAuthorities().stream()
 		        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
 	 
-if(!isAdmin) {
-	  if(!fromAccount.get().getCustomer().getEmail()
-			  .equalsIgnoreCase(authenticatedEmail)) {
-		  
-		  throw new AccessDeniedException(
-				  "You are not authorized to access this user's accounts");
-	  }
-}
 
-		if (!fromAccount.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
-					|| !toAccount.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
-				throw new CannotTransferException();
-			}
-		if (!fromAccount.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
-					|| !toAccount.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
-				throw new CannotTransferException();
-			}
 		if(fromAccount.isPresent() && toAccount.isPresent()) {
+			
+		
+			//----------------------------------------------- authorization stuff	
+			if(!isAdmin) {
+				  if(!fromAccount.get().getCustomer().getEmail()
+						  .equalsIgnoreCase(authenticatedEmail)) {
+					  
+					  throw new AccessDeniedException(
+							  "You are not authorized to access this user's accounts");
+				  }
+			}
+
+					if (!fromAccount.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
+								|| !toAccount.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
+							throw new CannotTransferException();
+						}
+					if (!fromAccount.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
+								|| !toAccount.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
+							throw new CannotTransferException();
+						}
+			
+			//-------------------------
+			
 			if (fromAccount.get().getId().equals(toAccount.get().getId())) {
 				throw new CannotTransferException();
 				

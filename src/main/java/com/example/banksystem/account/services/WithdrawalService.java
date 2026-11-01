@@ -45,7 +45,7 @@ public class WithdrawalService implements TwoParamCommand<DepositDTO, String> {
 	
 	@Override
 	public String execute(Integer accountId, DepositDTO request) {
-		Optional<Account> account = accountRepository.findById(accountId);
+		Optional<Account> account = accountRepository.findByIdWithLock(accountId);
 		if(account.isPresent()) {
 			
 			if (!account.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
