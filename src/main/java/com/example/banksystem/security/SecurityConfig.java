@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -43,11 +44,18 @@ public class SecurityConfig {
 
 		 return httpSecurity
 					.csrf(csrf -> csrf.disable())
+					
+				    .sessionManagement(session -> session
+				            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				        )
+					
 					.exceptionHandling(exception -> exception
 					        .authenticationEntryPoint(
 					            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
 					        )
 					    )
+					
+					
 					.authorizeHttpRequests(authorize -> {
 						authorize.requestMatchers("/login").permitAll();
 						authorize.requestMatchers("/api/createnewuser").permitAll();
