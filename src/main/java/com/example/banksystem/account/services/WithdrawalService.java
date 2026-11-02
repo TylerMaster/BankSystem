@@ -48,13 +48,14 @@ public class WithdrawalService implements TwoParamCommand<DepositDTO, String> {
 		Optional<Account> account = accountRepository.findByIdWithLock(accountId);
 		if(account.isPresent()) {
 			
-			if (!account.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
-					|| !account.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
-				throw new CannotTransferException();
+			if (!account.get().getCustomer().getStatus()
+			        .equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
+			    throw new CannotTransferException();
 			}
-		if (!account.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
-					|| !account.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
-				throw new CannotTransferException();
+
+			if (!account.get().getStatus()
+			        .equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
+			    throw new CannotTransferException();
 			}
 			
 			Authentication authentication =

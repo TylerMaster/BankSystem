@@ -41,18 +41,18 @@ public class DepositService implements TwoParamCommand<DepositDTO, String> {
 	@Override
 	public String execute(Integer id, DepositDTO request) {
 		
-		Optional<Account> account = accountRepository.findById(id);
+		Optional<Account> account = accountRepository.findByIdWithLock(id);
 		if (account.isPresent()) {
 			
-			if (!account.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
-					|| !account.get().getCustomer().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
-				throw new CannotTransferException();
+			if (!account.get().getCustomer().getStatus()
+			        .equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
+			    throw new CannotTransferException();
 			}
-		if (!account.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())
-					|| !account.get().getStatus().equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
-				throw new CannotTransferException();
+
+			if (!account.get().getStatus()
+			        .equalsIgnoreCase(CustomerStatus.ACTIVE.getMessage())) {
+			    throw new CannotTransferException();
 			}
-			
 			Authentication authentication =
 	                SecurityContextHolder.getContext().getAuthentication();
 		  

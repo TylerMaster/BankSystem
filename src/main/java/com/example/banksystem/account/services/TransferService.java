@@ -44,13 +44,23 @@ public class TransferService implements TwoParamCommand<TransferDTO, String>{
 	}
 	@Override
 	public String execute(Integer fromAccountId, TransferDTO input){
-		Optional<Account> fromAccount =
-			    accountRepository.findByIdWithLock(fromAccountId);
 		
-		Optional<Account> toAccount =
-			    accountRepository.findByAccountNumberWithLock(
-			        input.getToAccountNumber()
-			    );
+		Account recipient = accountRepository.findByAccountNumber(input.getToAccountNumber())
+				.orElseThrow(AccountNotFoundException::new);
+		
+		Integer firstId = Math.min(fromAccountId, recipient.getId());
+		Integer secondId = Math.max(fromAccountId, recipient.getId());
+		
+		Optional<Account> firstAccount =
+			    accountRepository.findByIdWithLock(firstId);
+		
+		Optional<Account> secondAccount =
+			    accountRepository.findByIdWithLock(
+			    		secondId		    
+			        );
+		
+		Optional<Account> fromAccount = firstId.equals(fromAccountId) ? firstAccount: secondAccount;
+		Optional<Account> toAccount = firstId.equals(recipient.getId()) ? firstAccount : secondAccount;
 		
 		Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -84,10 +94,9 @@ public class TransferService implements TwoParamCommand<TransferDTO, String>{
 			
 			//-------------------------
 			
-			if (fromAccount.get().getId().equals(toAccount.get().getId())) {
-				throw new CannotTransferException();
-				
-			}
+					if (fromAccountId.equals(recipient.getId())) {
+					    throw new CannotTransferException();
+					}
 			
 			 if (input.getAmount() == null
 		                || input.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
